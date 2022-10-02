@@ -1,6 +1,7 @@
 const User = require('../model/user')
 const HttpError = require('../model/http-error')
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 
 const getUsers = async (req, res, next) => {
     let users
@@ -51,7 +52,20 @@ const singup = async (req, res, next) => {
         return next(error)
     }
 
-    res.status(201).json({ user: createUser.toObject({ getters: true }) })
+    let token
+
+    try {
+        token = jwt.sign(
+            { userId: createUser.id, username: createUser.username },
+            'secret_key',
+            { expiresIn: '1h' }
+        )
+    } catch (err) {
+        const error = new HttpError('Sing up faild.', 500)
+        return next(error)
+    }
+
+    res.status(201).json({ user: createUser.toObject({ getters: true }), })
 }
 
 const login = async (req, res, next) => {
@@ -83,7 +97,21 @@ const login = async (req, res, next) => {
         return next(error)
     }
 
-    res.json({ user: existingUser })
+    try {
+        token = jwt.sign(
+            { userId: existingUser.id, username: existingUser.username },
+            'secret_key',
+            { expiresIn: '1h' }
+        )
+    } catch (err) {
+        const error = new HttpError('Sing up faild.', 500)
+        return next(error)
+    }
+
+    res.json({
+        user: existingUser,
+        token: token
+    })
 }
 
 exports.getUsers = getUsers
