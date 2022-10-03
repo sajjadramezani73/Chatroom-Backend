@@ -26,8 +26,8 @@ const singup = async (req, res, next) => {
     }
 
     if (existingUser) {
-        const error = new HttpError('user exist !', 422)
-        return next(error)
+        res.status(422).json({ success: 0, errorMessage: 'نام کاربری قبلا انتخاب شده است' })
+        return next()
     }
 
     let hashPassword
@@ -65,7 +65,7 @@ const singup = async (req, res, next) => {
         return next(error)
     }
 
-    res.status(201).json({ user: createUser.toObject({ getters: true }), })
+    res.status(201).json({ success: 1, message: 'ثبت نام با موفقیت انجام شد' })
 }
 
 const login = async (req, res, next) => {

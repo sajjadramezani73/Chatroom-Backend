@@ -3,7 +3,7 @@ const router = express()
 
 const userRoutes = require('../controllers/user-controllers')
 
-router.get('', userRoutes.getUsers)
+router.get('/', userRoutes.getUsers)
 
 router.post('/singup', userRoutes.singup)
 
