@@ -53,7 +53,6 @@ const singup = async (req, res, next) => {
     }
 
     let token
-
     try {
         token = jwt.sign(
             { userId: createUser.id, username: createUser.username },
@@ -80,8 +79,8 @@ const login = async (req, res, next) => {
     }
 
     if (!existingUser) {
-        const error = new HttpError('user is not exist', 422)
-        return next(error)
+        res.status(422).json({ success: 0, errorMessage: 'کاربری با این مشخصات یافت نشد' })
+        return next()
     }
 
     let validPassword = false
@@ -93,10 +92,11 @@ const login = async (req, res, next) => {
     }
 
     if (!validPassword) {
-        const error = new HttpError('password is not valid', 422)
-        return next(error)
+        res.status(422).json({ success: 0, errorMessage: 'رمز عبور وارد شده اشتباه است' })
+        return next()
     }
 
+    let token
     try {
         token = jwt.sign(
             { userId: existingUser.id, username: existingUser.username },
@@ -109,6 +109,7 @@ const login = async (req, res, next) => {
     }
 
     res.json({
+        message: 'با موفقیت وارد شدید',
         user: existingUser,
         token: token
     })
