@@ -41,7 +41,7 @@ const singup = async (req, res, next) => {
     const createUser = new User({
         username: username,
         password: hashPassword,
-        avatar: 'user',
+        avatar: '',
         gender: gender
     })
 
