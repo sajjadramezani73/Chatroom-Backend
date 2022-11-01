@@ -42,7 +42,8 @@ const singup = async (req, res, next) => {
         username: username,
         password: hashPassword,
         avatar: '',
-        gender: gender
+        gender: gender,
+        hasAvatar: 0
     })
 
     try {
@@ -115,6 +116,41 @@ const login = async (req, res, next) => {
     })
 }
 
+const updeteUser = async (req, res, next) => {
+    const { id, username, gender, deleteAvatar } = req.body
+    let existingUser
+    try {
+        existingUser = await User.findOne({ _id: id })
+    } catch (err) {
+        const error = new HttpError('update faild !', 500)
+        return next(error)
+    }
+
+    if (!existingUser) {
+        res.status(422).json({ success: 0, errorMessage: 'کاربری با این مشخصات یافت نشد' })
+        return next()
+    }
+
+    let updatedUser
+    try {
+        updatedUser = await User.findOneAndUpdate(
+            { _id: id },
+            {
+                username: username,
+                gender: gender,
+                avatar: !!req.file ? req.file.path : '',
+                hasAvatar: !!req.file ? 1 : 0
+            },
+            { new: true })
+    } catch (err) {
+        const error = new HttpError('update faild !', 500)
+        return next(error)
+    }
+
+    res.json({ user: updatedUser })
+}
+
 exports.getUsers = getUsers
 exports.singup = singup
 exports.login = login
+exports.updeteUser = updeteUser
