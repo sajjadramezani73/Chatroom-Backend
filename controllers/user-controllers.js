@@ -118,6 +118,7 @@ const login = async (req, res, next) => {
 
 const updeteUser = async (req, res, next) => {
     const { id, username, gender, deleteAvatar } = req.body
+
     let existingUser
     try {
         existingUser = await User.findOne({ _id: id })
@@ -128,6 +129,22 @@ const updeteUser = async (req, res, next) => {
 
     if (!existingUser) {
         res.status(422).json({ success: 0, errorMessage: 'کاربری با این مشخصات یافت نشد' })
+        return next()
+    }
+
+    let userWithDeleteAvatar
+    if (!!deleteAvatar && deleteAvatar == 1) {
+        try {
+            userWithDeleteAvatar = await User.findOneAndUpdate(
+                { _id: id },
+                { avatar: '', hasAvatar: 0 },
+                { new: true }
+            )
+        } catch (err) {
+            const error = new HttpError('update faild !', 500)
+            return next(error)
+        }
+        res.json({ user: userWithDeleteAvatar, message: 'تصویر پروفایل شما با موفقیت حذف شد' })
         return next()
     }
 
@@ -147,7 +164,7 @@ const updeteUser = async (req, res, next) => {
         return next(error)
     }
 
-    res.json({ user: updatedUser })
+    res.json({ user: updatedUser, message: 'ویرایش اطلاعات شما با موفقیت انجام شد' })
 }
 
 exports.getUsers = getUsers
