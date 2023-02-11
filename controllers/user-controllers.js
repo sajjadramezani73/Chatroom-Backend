@@ -15,7 +15,7 @@ const getUsers = async (req, res, next) => {
 }
 
 const singup = async (req, res, next) => {
-    const { username, password, gender } = req.body
+    const { username, firstname, lastname, password, gender } = req.body
 
     let existingUser
     try {
@@ -40,6 +40,8 @@ const singup = async (req, res, next) => {
 
     const createUser = new User({
         username: username,
+        firstname: firstname,
+        lastname: lastname,
         password: hashPassword,
         avatar: '',
         gender: gender,
