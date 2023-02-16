@@ -6,9 +6,9 @@ const userSchema = new Schema({
     firstname: { type: String, required: true },
     lastname: { type: String, required: true },
     password: { type: String, required: true },
-    avatar: { type: String, required: false },
+    avatar: { type: Array, default: [] },
     gender: { type: String, required: true },
-    hasAvatar: { type: Number, required: true },
+    bio: { type: String }
 })
 
 module.exports = mongoose.model('User', userSchema)

@@ -1,7 +1,8 @@
 const User = require('../model/user')
 const HttpError = require('../model/http-error')
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose')
 
 const getUsers = async (req, res, next) => {
     let users
@@ -43,9 +44,9 @@ const singup = async (req, res, next) => {
         firstname: firstname,
         lastname: lastname,
         password: hashPassword,
-        avatar: '',
+        avatar: [],
         gender: gender,
-        hasAvatar: 0
+        bio: ''
     })
 
     try {
@@ -119,7 +120,7 @@ const login = async (req, res, next) => {
 }
 
 const updeteUser = async (req, res, next) => {
-    const { id, username, gender, deleteAvatar } = req.body
+    const { id, firstname, lastname, gender, bio, deleteAvatar } = req.body
 
     let existingUser
     try {
@@ -151,14 +152,18 @@ const updeteUser = async (req, res, next) => {
     }
 
     let updatedUser
+    if (req.file) {
+        existingUser.avatar.push({ id: new mongoose.Types.ObjectId(), path: req.file.path })
+    }
     try {
         updatedUser = await User.findOneAndUpdate(
             { _id: id },
             {
-                username: username,
+                firstname: firstname,
+                lastname: lastname,
                 gender: gender,
-                avatar: !!req.file ? req.file.path : '',
-                hasAvatar: !!req.file ? 1 : 0
+                avatar: existingUser.avatar,
+                bio: bio
             },
             { new: true })
     } catch (err) {
