@@ -120,7 +120,7 @@ const login = async (req, res, next) => {
 }
 
 const updeteUser = async (req, res, next) => {
-    const { id, firstname, lastname, gender, bio, deleteAvatar } = req.body
+    const { id, username, firstname, lastname, gender, bio, deleteAvatar } = req.body
 
     let existingUser
     try {
@@ -132,6 +132,19 @@ const updeteUser = async (req, res, next) => {
 
     if (!existingUser) {
         res.status(422).json({ success: 0, errorMessage: 'کاربری با این مشخصات یافت نشد' })
+        return next()
+    }
+
+    let existingOldUser
+    try {
+        existingOldUser = await User.findOne({ username: username })
+    } catch (err) {
+        const error = new HttpError('update faild !', 500)
+        return next(error)
+    }
+
+    if (existingOldUser && existingOldUser.id !== existingUser.id) {
+        res.status(422).json({ success: 0, errorMessage: 'نام کاربری قبلا انتخاب شده است' })
         return next()
     }
 
@@ -159,6 +172,7 @@ const updeteUser = async (req, res, next) => {
         updatedUser = await User.findOneAndUpdate(
             { _id: id },
             {
+                username: username,
                 firstname: firstname,
                 lastname: lastname,
                 gender: gender,
