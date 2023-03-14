@@ -7,12 +7,12 @@ const mongoose = require('mongoose')
 const getUsers = async (req, res, next) => {
     let users
     try {
-        users = await User.find()
+        users = await User.find().select('gender username avatar')
     } catch (err) {
         const error = new HttpError('Getting user faild', 500)
         return next(error)
     }
-    res.json({ users: users.map(user => user.toObject({ gettesr: true })) })
+    res.json({ users: users })
 }
 
 const singup = async (req, res, next) => {
